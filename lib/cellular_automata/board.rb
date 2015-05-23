@@ -24,14 +24,7 @@ class CellularAutomata::Board
   end
 
   def tick!
-    each_cell do |cell|
-      neighbors = cell.live_neighbors.length
-      if @birth.include? neighbors
-        cell.live!
-      elsif @death.include? neighbors
-        cell.die!
-      end
-    end
+    each_cell { |cell| cell.tick! }
   end
 
   private
@@ -53,16 +46,15 @@ class CellularAutomata::Board
   end
 
   def each_cell
-    (0..height-1).each do |row|
-      (0..width-1).each do |col|
-        yield @array[row][col]
+    (0..height-1).each do |y|
+      (0..width-1).each do |x|
+        yield @array[y][x]
       end
     end
-
   end
 
   def seed!
-    each_cell { |c| c.live! if rand < 0.9 }
+    each_cell { |c| c.live! if rand < 0.2 }
   end
 
   def build_array
