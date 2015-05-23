@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'cellular_automata'
+
+CellularAutomata::Animator.animate
