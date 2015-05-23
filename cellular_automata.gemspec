@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["ffleming@gmail.com"]
 
   spec.summary       = %q{A simulation of cellular automata}
-  spec.description   = %q{A superset of 0-player games, of which Conway's Game of Life is a member.}
+  spec.description   = %q{A set of 0-player games, of which Conway's Game of Life is a member.}
   spec.homepage      = "https://github.com/ffleming/cellular_automata"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
