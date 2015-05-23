@@ -2,7 +2,7 @@ module CellularAutomata::Animator
   class << self
     attr_reader :board
     def board
-      @board ||= CellularAutomata::Board.new(width: 100, height: 30, rule: 'B3S124')
+      @board ||= CellularAutomata::Board.new(width: 100, height: 30, rule: 'B3S2')
     end
     def animate(steps=100, refresh=0.1)
       (1..steps).each do

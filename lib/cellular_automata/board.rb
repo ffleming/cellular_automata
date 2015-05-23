@@ -1,3 +1,5 @@
+require 'benchmark'
+
 class CellularAutomata::Board
   attr_reader :width, :height, :rule
   def initialize(rule: 'B3S2', width: 80, height: 20)
@@ -5,7 +7,6 @@ class CellularAutomata::Board
     @height = height
     @width  = width
     @array  = build_array
-    CellularAutomata::Cell::array = @array
     parse_rule(rule)
     seed!
   end
@@ -24,7 +25,14 @@ class CellularAutomata::Board
   end
 
   def tick!
-    each_cell { |cell| cell.tick! }
+    each_cell do |cell|
+      adj_pop = neighbor_population_of(cell)
+      if @birth.include? adj_pop
+        cell.live!
+      elsif @death.include? adj_pop
+        cell.die!
+      end
+    end
   end
 
   private
@@ -67,5 +75,24 @@ class CellularAutomata::Board
     end
     return arr
   end
+
+  def neighbor_population_of(cell)
+    neighbors_of(cell).select(&:alive?).length
+  end
+
+  def cell_at(y, x)
+    return nil if x  < 0 || y < 0
+    return nil if y > @array.length-1
+    return nil if x > @array[0].length-1
+    return @array[y][x]
+  end
+
+  def neighbors_of(cell)
+    y = cell.y ; x = cell.x
+    [ cell_at(y-1, x-1), cell_at(y-1, x  ), cell_at(y-1, x+1),
+      cell_at(y,   x+1),                    cell_at(y  , x-1),
+      cell_at(y+1, x-1), cell_at(y+1, x  ), cell_at(y+1, x+1) ].compact
+  end
+
 end
 
