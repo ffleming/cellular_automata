@@ -22,7 +22,14 @@ class CellularAutomata::Cell
     @alive = false
   end
 
+  def survive!
+  end
+
   def dead?
     !alive?
+  end
+
+  def copy
+    self.class.new(alive: alive?, row: row, column: column)
   end
 end

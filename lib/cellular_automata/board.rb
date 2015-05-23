@@ -1,20 +1,17 @@
-require 'benchmark'
-
 class CellularAutomata::Board
   attr_reader :width, :height, :rule
   def initialize(rule: 'B3S2', width: 80, height: 20)
-    @rule   = rule
     @height = height
     @width  = width
-    @array  = build_array
-    parse_rule(rule)
+    @state  = build_array
+    @rule   = CellularAutomata::Rule.new(rule)
     seed!
   end
 
   def to_s
     line = '+' << ('-' * width) << "+\n"
     ret = '' << line
-    @array.each do |row|
+    @state.each do |row|
       ret << "|"
       row.each do |cell|
         ret << cell.to_s
@@ -25,52 +22,33 @@ class CellularAutomata::Board
   end
 
   def tick!
+    next_state = Marshal.load(Marshal.dump @state)
     each_cell do |cell|
-      adj_pop = neighbor_population_of(cell)
-      if @birth.include? adj_pop
-        cell.live!
-      elsif @death.include? adj_pop
-        cell.die!
-      end
+      next_state[cell.y][cell.x].send rule.process(neighbor_population_of cell) #= next_cell #cell.send(rule.process(adj_pop))
     end
+    @state = next_state
   end
 
   private
 
-  def parse_rule(rule)
-    rules = rule.scan(/[BS]\d+/)
-    raise ArgumentError.new('Invalid rule string') if rules.length != 2
-    birth = rules.select {|s| s.start_with?('B')}.first
-    survive = rules.select {|s| s.start_with?('S')}.first
-    set_rules(birth: birth, survive: survive)
-  end
-
-  def set_rules(birth: , survive: )
-    birth = birth[1..-1]
-    survive = survive[1..-1]
-    @birth = birth.split('').map(&:to_i)
-    @survive = survive.split('').map(&:to_i)
-    @death = ((0..8).to_a - @birth) - @survive
-  end
-
   def each_cell
     (0..height-1).each do |y|
       (0..width-1).each do |x|
-        yield @array[y][x]
+        yield @state[y][x]
       end
     end
   end
 
   def seed!
-    each_cell { |c| c.live! if rand < 0.2 }
+    each_cell { |c| c.live! if rand < 0.1 }
   end
 
   def build_array
     arr = []
-    (0..height-1).each do |i|
-      arr[i] = []
-      (0..width-1).each do |j|
-        arr[i][j] = CellularAutomata::Cell.new(row: i, column: j)
+    (0..height-1).each do |y|
+      arr[y] = []
+      (0..width-1).each do |x|
+        arr[y][x] = CellularAutomata::Cell.new(row: y, column: x, alive: false)
       end
     end
     return arr
@@ -82,9 +60,9 @@ class CellularAutomata::Board
 
   def cell_at(y, x)
     return nil if x  < 0 || y < 0
-    return nil if y > @array.length-1
-    return nil if x > @array[0].length-1
-    return @array[y][x]
+    return nil if y > @state.length-1
+    return nil if x > @state[0].length-1
+    return @state[y][x]
   end
 
   def neighbors_of(cell)
