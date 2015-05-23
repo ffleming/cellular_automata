@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+
+require 'cellular_automata'
+require 'optparse'
+require 'gosu'
+
+def opts_from_cli
+  options = {}
+  opt_parser = OptionParser.new do |opts|
+    opts.program_name = File.basename(__FILE__)
+    opts.banner = "#{opts.program_name} [options] RULE"
+    opts.on('-w WIDTH', '--width WIDTH', 'Set width') { |w| options[:width] = w.to_i }
+    opts.on('-h HEIGHT', '--height HEIGHT', 'Set height') { |h| options[:height] = h.to_i }
+    opts.on('-r REFRESH', '--refresh REFRESH', 'Set refresh rate in seconds') { |r| options[:refresh] = r.to_f }
+    opts.on('-v', '--version', 'Print version information') do
+      puts "#{File.basename(__FILE__)} #{CellularAutomata::VERSION}"
+      exit true
+    end
+    opts.on('--help', 'Display this screen') do
+      puts opts
+      exit true
+    end
+  end
+  begin
+    opt_parser.parse!
+  rescue OptionParser::InvalidOption => e
+    puts e.message
+    exit false
+  end
+  options
+end
+
+opts = opts_from_cli
+opts[:width]  ||= 160
+opts[:height] ||= 120
+opts[:refresh] ||= 0.0
+rule = ARGV[0] || 'B3S2'
+opts[:rule] = rule
+
+trap 'SIGINT' do
+  exit
+end
+
+# while true do
+#   puts "\e[H\e[2J"
+#   board.tick!
+#   puts board.to_s
+#   sleep opts[:refresh]
+# end
+
+class GameWindow < Gosu::Window
+  attr_reader :board, :scale
+  def initialize(opts={})
+    @scale = 2
+    super opts[:width]*scale, opts[:height]*scale
+    @board = CellularAutomata::Board.new(width: opts[:width], height: opts[:height], rule: opts[:rule])
+    self.caption = "Cellular Automata"
+  end
+
+  def update
+    board.tick!
+  end
+
+  def draw
+    board.each_cell do |cell|
+      color = cell.alive? ? Gosu::Color::WHITE : Gosu::Color::BLACK
+      Gosu.draw_rect(cell.x * scale, cell.y * scale, scale, scale, color)
+    end
+  end
+end
+
+window = GameWindow.new(opts)
+window.show
+

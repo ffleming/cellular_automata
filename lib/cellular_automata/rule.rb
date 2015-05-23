@@ -15,7 +15,7 @@ class CellularAutomata::Rule
 
   def process_rule!(rule_string)
     rules = rule_string.scan(/[BS]\d+/)
-    raise ArgumentError.new('Invalid rule string') if rules.length != 2
+    raise ArgumentError.new("Invalid rule string #{rule_string}") if rules.length != 2
     birth_string = rules.select {|s| s.start_with?('B')}.first
     survive_string = rules.select {|s| s.start_with?('S')}.first
     (birth, survive) = [birth_string, survive_string].map { |s| s[1..-1].split('').map(&:to_i) }

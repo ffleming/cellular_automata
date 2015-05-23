@@ -29,8 +29,6 @@ class CellularAutomata::Board
     @state = next_state
   end
 
-  private
-
   def each_cell
     (0..height-1).each do |y|
       (0..width-1).each do |x|
@@ -38,6 +36,8 @@ class CellularAutomata::Board
       end
     end
   end
+
+  private
 
   def seed!
     each_cell { |c| c.live! if rand < 0.1 }
