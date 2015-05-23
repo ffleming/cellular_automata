@@ -1,7 +1,7 @@
 # CellularAutomata
 
-This is yet another cellular automata implementation.  First Conway's, and then
-we'll see where it goes.
+This is yet another cellular automata implementation.  Public API is liable to
+break until 0.2.0.
 
 ## Installation
 
