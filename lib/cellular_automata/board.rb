@@ -1,10 +1,12 @@
 class CellularAutomata::Board
-  attr_reader :width, :height
-  def initialize(width: 80, height: 20)
-    @height            = height
-    @width             = width
-    @array             = build_array
-    CellularAutomata::Cell::array        = @array
+  attr_reader :width, :height, :rule
+  def initialize(rule: 'B3S2', width: 80, height: 20)
+    @rule   = rule
+    @height = height
+    @width  = width
+    @array  = build_array
+    CellularAutomata::Cell::array = @array
+    parse_rule(rule)
     seed!
   end
 
@@ -21,29 +23,34 @@ class CellularAutomata::Board
     ret << line
   end
 
-  def cycle!
+  def tick!
     each_cell do |cell|
-      case cell.live_neighbors.length
-      when 0..1
-        cell.die!
-      when 3
+      neighbors = cell.live_neighbors.length
+      if @birth.include? neighbors
         cell.live!
-      when 4..8
+      elsif @death.include? neighbors
         cell.die!
       end
     end
   end
 
-  def animate(steps=1000, refresh=0.1)
-    (1..steps).each do |i|
-      puts "\e[H\e[2J"
-      cycle!
-      puts self.to_s
-      sleep refresh
-    end
+  private
+
+  def parse_rule(rule)
+    rules = rule.scan(/[BS]\d+/)
+    raise ArgumentError.new('Invalid rule string') if rules.length != 2
+    birth = rules.select {|s| s.start_with?('B')}.first
+    survive = rules.select {|s| s.start_with?('S')}.first
+    set_rules(birth: birth, survive: survive)
   end
 
-  private
+  def set_rules(birth: , survive: )
+    birth = birth[1..-1]
+    survive = survive[1..-1]
+    @birth = birth.split('').map(&:to_i)
+    @survive = survive.split('').map(&:to_i)
+    @death = ((0..8).to_a - @birth) - @survive
+  end
 
   def each_cell
     (0..height-1).each do |row|
@@ -55,7 +62,7 @@ class CellularAutomata::Board
   end
 
   def seed!
-    each_cell { |c| c.live! if rand < 0.2 }
+    each_cell { |c| c.live! if rand < 0.9 }
   end
 
   def build_array
