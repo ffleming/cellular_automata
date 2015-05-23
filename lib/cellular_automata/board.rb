@@ -55,11 +55,7 @@ class CellularAutomata::Board
   end
 
   def seed!
-    (0..height-1).each do |row|
-      (0..width-1).each do |col|
-        @array[row][col].live! if rand < 0.2
-      end
-    end
+    each_cell { |c| c.live! if rand < 0.2 }
   end
 
   def build_array
