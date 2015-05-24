@@ -1,10 +1,13 @@
 class CellularAutomata::Board
-  attr_reader :width, :height, :rule
-  def initialize(rule: 'B3S2', width: 80, height: 20)
+  attr_reader :width, :height, :rule, :history
+  def initialize(rule: 'B3S2', width: 80, height: 20, max_history: 2)
     @height = height
     @width  = width
     @state  = build_array
     @rule   = CellularAutomata::Rule.new(rule)
+    @history = []
+    @max_history = max_history
+    max_history.times { history.push build_array }
     seed!
   end
 
@@ -26,6 +29,8 @@ class CellularAutomata::Board
     each_cell do |cell|
       next_state[cell.y][cell.x].send rule.process(neighbor_population_of cell) #= next_cell #cell.send(rule.process(adj_pop))
     end
+    history.unshift Marshal.load(Marshal.dump @state)
+    history.pop if history.length > @max_history
     @state = next_state
   end
 

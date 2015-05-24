@@ -15,7 +15,16 @@ class CellWindow < Gosu::Window
 
   def draw
     board.each_cell do |cell|
-      color = cell.alive? ? Gosu::Color::YELLOW : Gosu::Color::BLACK
+      prev_1 = board.history[0][cell.y][cell.x]
+      prev_2 = board.history[1][cell.y][cell.x]
+      color = Gosu::Color::BLACK
+      if cell.alive?
+        color = Gosu::Color.argb(0xff_FFFF00)
+      elsif prev_1.alive?
+        color = Gosu::Color.argb(0xff_AAAA00)
+      elsif prev_2.alive?
+        color = Gosu::Color.argb(0xff_444400)
+      end
       Gosu.draw_rect(cell.x * scale**2, cell.y * scale**2, cell_width, cell_width, color, 0, :default)
     end
   end
