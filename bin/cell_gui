@@ -11,7 +11,10 @@ def opts_from_cli
     opts.banner = "#{opts.program_name} [options] RULE"
     opts.on('-w WIDTH', '--width WIDTH', 'Set width') { |w| options[:width] = w.to_i }
     opts.on('-h HEIGHT', '--height HEIGHT', 'Set height') { |h| options[:height] = h.to_i }
-    opts.on('-r REFRESH', '--refresh REFRESH', 'Set refresh rate in seconds') { |r| options[:refresh] = r.to_f }
+    opts.on('-s SCALE', '--scale SCALE', 'Factor by which to scale game board') { |s| options[:scale] = s.to_i }
+    opts.on('-c WIDTH', '--cell-width WIDTH', 'Factor by which to scale cells', 'Use 1 for an \'LED\' look',
+            'Use 2 for no borders around cells', 'or choose anything in between') {|w| options[:cell_scale] = w.to_f }
+    opts.on('-f', '--full-screen', 'Full screen') { options[:fullscreen] = true }
     opts.on('-v', '--version', 'Print version information') do
       puts "#{File.basename(__FILE__)} #{CellularAutomata::VERSION}"
       exit true
@@ -33,7 +36,11 @@ end
 opts = opts_from_cli
 opts[:width]  ||= 160
 opts[:height] ||= 120
-opts[:refresh] ||= 0.0
+opts[:scale] ||= 2
+opts[:cell_scale] ||= 2.0
+opts[:cell_scale] = 2.0 if opts[:cell_scale] > 2.0
+opts[:cell_scale] = 1.0 if opts[:cell_scale] < 1.0
+opts[:fullscreen] ||= false
 rule = ARGV[0] || 'B3S2'
 opts[:rule] = rule
 
@@ -41,34 +48,6 @@ trap 'SIGINT' do
   exit
 end
 
-# while true do
-#   puts "\e[H\e[2J"
-#   board.tick!
-#   puts board.to_s
-#   sleep opts[:refresh]
-# end
-
-class GameWindow < Gosu::Window
-  attr_reader :board, :scale
-  def initialize(opts={})
-    @scale = 2
-    super opts[:width]*scale, opts[:height]*scale
-    @board = CellularAutomata::Board.new(width: opts[:width], height: opts[:height], rule: opts[:rule])
-    self.caption = "Cellular Automata"
-  end
-
-  def update
-    board.tick!
-  end
-
-  def draw
-    board.each_cell do |cell|
-      color = cell.alive? ? Gosu::Color::WHITE : Gosu::Color::BLACK
-      Gosu.draw_rect(cell.x * scale, cell.y * scale, scale, scale, color)
-    end
-  end
-end
-
-window = GameWindow.new(opts)
+window = CellWindow.new(opts)
 window.show
-
+exit
