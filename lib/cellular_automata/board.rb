@@ -29,8 +29,8 @@ class CellularAutomata::Board
     each_cell do |x, y|
       result = rule.process(neighbor_population_of(x: x, y: y)) #= next_cell #cell.send(rule.process(adj_pop))
       # next_state[y][x].send 
-      next_state[y][x] = false if result == :die!
-      next_state[y][x] = true if result == :live!
+      next_state[y][x] = 0 if result == :die!
+      next_state[y][x] = 1 if result == :live!
     end
     history.unshift Marshal.load(Marshal.dump @state)
     history.pop if history.length > @max_history
@@ -38,11 +38,11 @@ class CellularAutomata::Board
   end
 
   def kill(array: , x: , y: )
-    array[y][x] = false
+    array[y][x] = 0
   end
 
   def live(array: , x: , y: )
-    array[y][x] = true
+    array[y][x] = 1
   end
 
   def each_cell
@@ -56,7 +56,7 @@ class CellularAutomata::Board
   private
 
   def seed!
-    each_cell { |x, y| @state[y][x] = true if rand < 0.1 }
+    each_cell { |x, y| @state[y][x] = 1 if rand < 0.1 }
   end
 
   def build_array
@@ -64,14 +64,15 @@ class CellularAutomata::Board
     (0..height-1).each do |y|
       arr[y] = []
       (0..width-1).each do |x|
-        arr[y][x] = false # CellularAutomata::Cell.new(row: y, column: x, alive: false)
+        arr[y][x] = 0 # CellularAutomata::Cell.new(row: y, column: x, alive: false)
       end
     end
     return arr
   end
 
   def neighbor_population_of(x: , y: )
-    neighbors_of(x: x, y: y).select {|c| c == true}.length
+    # neighbors_of(x: x, y: y).select {|c| c == true}.length
+    neighbors_of(x:x, y: y).inject(:+)
   end
 
   def cell_at(y, x)

@@ -15,10 +15,10 @@ class CellWindow < Gosu::Window
 
   def draw
     board.each_cell do |x, y|
-      prev_1 = board.history[0][y][x]
-      prev_2 = board.history[1][y][x]
+      prev_1 = board.history[0][y][x] == 1
+      prev_2 = board.history[1][y][x] == 1
       color = Gosu::Color::BLACK
-      if board.state[y][x]
+      if board.state[y][x] == 1
         color = Gosu::Color.argb(0xff_FFFF00)
       elsif prev_1
         color = Gosu::Color.argb(0xff_AAAA00)
