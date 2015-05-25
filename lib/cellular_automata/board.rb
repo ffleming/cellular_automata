@@ -76,8 +76,8 @@ class CellularAutomata::Board
 
   def cell_at(y, x)
     return nil if x  < 0 || y < 0
-    return nil if y > @state.length-1
-    return nil if x > @state[0].length-1
+    return nil if y > height - 1
+    return nil if x > width - 1
     return @state[y][x]
   end
 
