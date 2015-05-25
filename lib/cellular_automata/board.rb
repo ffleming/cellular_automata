@@ -1,5 +1,5 @@
 class CellularAutomata::Board
-  attr_reader :width, :height, :rule, :history
+  attr_reader :width, :height, :rule, :history, :state
   def initialize(rule: 'B3S2', width: 80, height: 20, max_history: 2)
     @height = height
     @width  = width
@@ -26,18 +26,29 @@ class CellularAutomata::Board
 
   def tick!
     next_state = Marshal.load(Marshal.dump @state)
-    each_cell do |cell|
-      next_state[cell.y][cell.x].send rule.process(neighbor_population_of cell) #= next_cell #cell.send(rule.process(adj_pop))
+    each_cell do |x, y|
+      result = rule.process(neighbor_population_of(x: x, y: y)) #= next_cell #cell.send(rule.process(adj_pop))
+      # next_state[y][x].send 
+      next_state[y][x] = false if result == :die!
+      next_state[y][x] = true if result == :live!
     end
     history.unshift Marshal.load(Marshal.dump @state)
     history.pop if history.length > @max_history
     @state = next_state
   end
 
+  def kill(array: , x: , y: )
+    array[y][x] = false
+  end
+
+  def live(array: , x: , y: )
+    array[y][x] = true
+  end
+
   def each_cell
     (0..height-1).each do |y|
       (0..width-1).each do |x|
-        yield @state[y][x]
+        yield(x, y)
       end
     end
   end
@@ -45,7 +56,7 @@ class CellularAutomata::Board
   private
 
   def seed!
-    each_cell { |c| c.live! if rand < 0.1 }
+    each_cell { |x, y| @state[y][x] = true if rand < 0.1 }
   end
 
   def build_array
@@ -53,14 +64,14 @@ class CellularAutomata::Board
     (0..height-1).each do |y|
       arr[y] = []
       (0..width-1).each do |x|
-        arr[y][x] = CellularAutomata::Cell.new(row: y, column: x, alive: false)
+        arr[y][x] = false # CellularAutomata::Cell.new(row: y, column: x, alive: false)
       end
     end
     return arr
   end
 
-  def neighbor_population_of(cell)
-    neighbors_of(cell).select(&:alive?).length
+  def neighbor_population_of(x: , y: )
+    neighbors_of(x: x, y: y).select {|c| c == true}.length
   end
 
   def cell_at(y, x)
@@ -70,8 +81,7 @@ class CellularAutomata::Board
     return @state[y][x]
   end
 
-  def neighbors_of(cell)
-    y = cell.y ; x = cell.x
+  def neighbors_of(x: , y: )
     [ cell_at(y-1, x-1), cell_at(y-1, x  ), cell_at(y-1, x+1),
       cell_at(y,   x+1),                    cell_at(y  , x-1),
       cell_at(y+1, x-1), cell_at(y+1, x  ), cell_at(y+1, x+1) ].compact

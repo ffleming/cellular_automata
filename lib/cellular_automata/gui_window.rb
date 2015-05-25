@@ -14,18 +14,18 @@ class CellWindow < Gosu::Window
   end
 
   def draw
-    board.each_cell do |cell|
-      prev_1 = board.history[0][cell.y][cell.x]
-      prev_2 = board.history[1][cell.y][cell.x]
+    board.each_cell do |x, y|
+      prev_1 = board.history[0][y][x]
+      prev_2 = board.history[1][y][x]
       color = Gosu::Color::BLACK
-      if cell.alive?
+      if board.state[y][x]
         color = Gosu::Color.argb(0xff_FFFF00)
-      elsif prev_1.alive?
+      elsif prev_1
         color = Gosu::Color.argb(0xff_AAAA00)
-      elsif prev_2.alive?
+      elsif prev_2
         color = Gosu::Color.argb(0xff_444400)
       end
-      Gosu.draw_rect(cell.x * scale**2, cell.y * scale**2, cell_width, cell_width, color, 0, :default)
+      Gosu.draw_rect(x * scale**2, y * scale**2, cell_width, cell_width, color, 0, :default)
     end
   end
 
