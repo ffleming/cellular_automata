@@ -17,7 +17,7 @@ class CellularAutomata::Board
     @state.each do |row|
       ret << "|"
       row.each do |cell|
-        ret << cell.to_s
+        ret << (cell == 0 ? ' ' : '*' )
       end
       ret << "|\n"
     end
