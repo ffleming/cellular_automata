@@ -21,7 +21,23 @@ Or install it yourself as:
 
 ## Usage
 
-At present, it can only play Conway's Game of Life.  Run `cell` to watch.
+```
+cell_gui [options] RULE
+    -w, --width WIDTH                Set width
+    -h, --height HEIGHT              Set height
+    -s, --scale SCALE                Factor by which to scale game board
+    -c, --cell-width WIDTH           Factor by which to scale cells
+                                     Use 1 for an 'LED' look
+                                     Use 2 for no borders around cells
+                                     or choose anything in between
+    -f, --full-screen                Full screen
+    -v, --version                    Print version information
+        --help                       Display this screen
+```
+
+RULE is a [standard Life Rule](http://www.conwaylife.com/wiki/Cellular_automaton) in the format `S.../B...`  The `/` is optional, and it doesn't matter which comes first.
+
+`cell` (a console version with simple ASCII output) also exists, but isn't near as interesting!
 
 ## Development
 
@@ -29,10 +45,6 @@ Install gosu dependencies:
 ```bash
 % brew install sdl2 libogg libvorbis
 ```
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
