@@ -25,12 +25,7 @@ class CellularAutomata::Board
   end
 
   def tick!
-    next_state = CellularC.dup_state(@state)# Marshal.load(Marshal.dump @state)
-    each_cell do |x, y|
-      result = rule.process(CellularC.neighbor_population_of(@state, x, y))
-      next_state[y][x] = 0 if result == :die!
-      next_state[y][x] = 1 if result == :live!
-    end
+    next_state = CellularC.next_state(@state, rule)
     history.unshift CellularC.dup_state(@state)
     history.pop if history.length > @max_history
     @state = next_state
