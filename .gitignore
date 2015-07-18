@@ -8,3 +8,5 @@
 /spec/reports/
 /tmp/
 *.gem
+/lib/*.bundle
+/bin/cell_console
