@@ -15,10 +15,10 @@ void Init_cellular_c() {
 }
 
 int cell_value(VALUE rule, int num_neighbors) {
-    VALUE symbol_hash = rb_iv_get(rule, "@rule_hash");
-    VALUE result = rb_hash_aref(symbol_hash, INT2FIX(num_neighbors));
-    VALUE live = ID2SYM(rb_intern("live!"));
-    VALUE die = ID2SYM(rb_intern("die!"));
+    VALUE rule_array = rb_iv_get(rule, "@rule_array");
+    VALUE result = rb_ary_entry(rule_array, num_neighbors);
+    VALUE live = ID2SYM(rb_intern("birth"));
+    VALUE die = ID2SYM(rb_intern("die"));
     if(result == die) {
         return 0;
     } else if(result == live) {
