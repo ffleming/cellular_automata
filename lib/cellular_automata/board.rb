@@ -27,7 +27,7 @@ class CellularAutomata::Board
   def tick!
     next_state = Marshal.load(Marshal.dump @state)
     each_cell do |x, y|
-      result = rule.process(neighbor_population_of(x: x, y: y))
+      result = rule.process(CellularC.neighbor_population_of(@state, x, y))
       next_state[y][x] = 0 if result == :die!
       next_state[y][x] = 1 if result == :live!
     end

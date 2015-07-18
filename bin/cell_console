@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'cellular_automata'
+require 'optparse'
+require 'byebug'
+require 'pry'
+
+width = 120
+height = 30
+rule = 'B3S2'
+board = CellularAutomata::Board.new(width: width, height: height, rule: rule)
+board.tick!
+board.tick!
+puts board.to_s
+state = board.state
+binding.pry
+exit
