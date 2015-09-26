@@ -2,7 +2,6 @@
 
 require 'cellular_automata'
 require 'optparse'
-require 'gosu'
 
 def opts_from_cli
   options = {}
@@ -11,10 +10,7 @@ def opts_from_cli
     opts.banner = "#{opts.program_name} [options] RULE"
     opts.on('-w WIDTH', '--width WIDTH', 'Set width') { |w| options[:width] = w.to_i }
     opts.on('-h HEIGHT', '--height HEIGHT', 'Set height') { |h| options[:height] = h.to_i }
-    opts.on('-s SCALE', '--scale SCALE', 'Factor by which to scale game board') { |s| options[:scale] = s.to_i }
-    opts.on('-c WIDTH', '--cell-width WIDTH', 'Factor by which to scale cells', 'Use 1 for an \'LED\' look',
-            'Use 2 for no borders around cells', 'or choose anything in between') {|w| options[:cell_scale] = w.to_f }
-    opts.on('-f', '--full-screen', 'Full screen') { options[:fullscreen] = true }
+    opts.on('-r REFRESH', '--refresh REFRESH', 'Set refresh rate in seconds') { |r| options[:refresh] = r.to_f }
     opts.on('-v', '--version', 'Print version information') do
       puts "#{File.basename(__FILE__)} #{CellularAutomata::VERSION}"
       exit true
@@ -34,20 +30,19 @@ def opts_from_cli
 end
 
 opts = opts_from_cli
-opts[:width]  ||= 160
-opts[:height] ||= 120
-opts[:scale] ||= 2
-opts[:cell_scale] ||= 2.0
-opts[:cell_scale] = 2.0 if opts[:cell_scale] > 2.0
-opts[:cell_scale] = 1.0 if opts[:cell_scale] < 1.0
-opts[:fullscreen] ||= false
+opts[:width]  ||= 120
+opts[:height] ||= 30
+opts[:refresh] ||= 0.1
 rule = ARGV[0] || 'B3S2'
-opts[:rule] = rule
+board = CellularAutomata::Board.new(width: opts[:width], height: opts[:height], rule: rule)
 
 trap 'SIGINT' do
   exit
 end
 
-window = CellWindow.new(opts)
-window.show
-exit
+while true do
+  puts "\e[H\e[2J"
+  board.tick!
+  puts board.to_s
+  sleep opts[:refresh]
+end

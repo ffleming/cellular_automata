@@ -22,7 +22,7 @@ Or install it yourself as:
 ## Usage
 
 ```
-cell_gui [options] RULE
+cell [options] RULE
     -w, --width WIDTH                Set width
     -h, --height HEIGHT              Set height
     -s, --scale SCALE                Factor by which to scale game board
@@ -37,7 +37,7 @@ cell_gui [options] RULE
 
 RULE is a [standard Life Rule](http://www.conwaylife.com/wiki/Cellular_automaton) in the format `S.../B...`  The `/` is optional, and it doesn't matter which comes first.
 
-`cell` (a console version with simple ASCII output) also exists, but isn't near as interesting!
+`cell_console` (a console version with simple ASCII output) also exists, but isn't near as interesting!
 
 ## Development
 
